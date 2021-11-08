@@ -52,6 +52,7 @@ void Ring::addNodeToNetwork() {
 }
 
 void Ring::startNetwork() {
+    token.Data = "0";
     token.receiverMac = devIdToMac[0];
     this->firstNode->receiveFrame(token, 0);
 }

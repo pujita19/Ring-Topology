@@ -9,6 +9,18 @@ string getRandomString() {
     return data;
 }
 
+void Node::passToken() {
+    int count = stoi(token.Data); // no of data packets has been transferred in the network
+    count++;
+    if(count>=MAX_TOKEN) return;   // Network terminated
+    else {
+        token.Data = to_string(count);
+        token.senderMac = this->macAddress;
+        token.receiverMac = this->rightLink->rightNode->macAddress;
+        this->sendFrame(token, 0);
+    }
+}
+
 DataFrame Node::createFrame() {   // frameType is data only
     string data=getRandomString();
     srand(time(NULL));
@@ -18,6 +30,13 @@ DataFrame Node::createFrame() {   // frameType is data only
         destDevId = rand()%(ringsize);
     }
     string destMac = devIdToMac[destDevId];
+
+    if(testcase == 1) {
+        int pfactor = 3;    // probability of non existence destination would be 1/pfactor
+        int x = (rand()+stoi(token.Data))%pfactor;
+        if(x==0) destMac = "-1";   // non existence mac address
+    } 
+
     DataFrame newframe('d', data, this->macAddress, destMac);
     return newframe;
 }
@@ -41,7 +60,13 @@ void Node::receiveFrame(DataFrame msg, int direction) {
     cout<<"DeviceID "<<deviceId<<": ";
     char msgType = msg.frameType;
     if(msgType == 'd') {
-        if(msg.receiverMac == this->macAddress) {
+        if(msg.senderMac == this->macAddress) {
+            cout<<"Destination device not found\n\n";     
+            // eg: a node (printer) got deleted from network but routing table isn't upto date.
+            // node has to trouble shoot 
+            this->passToken();
+        }
+        else if(msg.receiverMac == this->macAddress) {
             cout<<"MESSAGE RECEIVED"<<endl;
             DataFrame newack('a', "0", this->macAddress, msg.senderMac);
             this->sendFrame(newack, 1-direction);
@@ -53,16 +78,8 @@ void Node::receiveFrame(DataFrame msg, int direction) {
     } 
     else if(msgType == 'a') {
         if(msg.receiverMac == this->macAddress) {
-            cout<<"ACK RECEIVED"<<endl<<endl<<endl;
-            int count = stoi(token.Data); // no of data packets has been transferred in the network
-            count++;
-            if(count>=MAX_TOKEN) return;   // Network terminated
-            else {
-                token.Data = to_string(count);
-                token.senderMac = this->macAddress;
-                token.receiverMac = this->rightLink->rightNode->macAddress;
-                this->sendFrame(token, 0);
-            }
+            cout<<"ACK RECEIVED"<<endl<<endl;
+            this->passToken();
         }
         else {
             cout<<"Ack passed forward"<<endl;
@@ -72,8 +89,11 @@ void Node::receiveFrame(DataFrame msg, int direction) {
     else {
         if(msg.receiverMac == this->macAddress) {
             DataFrame newframe = createFrame();
-            cout<<"Token received."<<" New Frame created, sending to "<<macToDevId[newframe.receiverMac]<<endl;   
-            // cout<<"             New Frame created. Send to "<<macToDevId[newframe.receiverMac]<<endl; 
+            int destId;
+            srand(time(NULL));
+            if(macToDevId.find(newframe.receiverMac) == macToDevId.end()) destId = ringsize + rand()%5;
+            else destId = macToDevId[newframe.receiverMac];
+            cout<<"Token received."<<" New Frame created, sending to "<<destId<<endl;   
             sendFrame(newframe, -1);    // direction should be decided by node in sendFrame function if set to -1
         }
     }

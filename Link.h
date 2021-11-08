@@ -6,9 +6,11 @@ using namespace std;
 
 class Link {
     public:
+    bool isBroken;
     Node *rightNode;    // next node to send packet if packet is been sent in clockwise direction
     Node *leftNode;    // next node to send packet if packet is been sent in anti-clockwise direction
     Link(Node &firstNode, Node &newNode) {
+        isBroken = false;
         rightNode = &firstNode;
         leftNode = &newNode;
     }

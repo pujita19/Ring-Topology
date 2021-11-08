@@ -19,6 +19,7 @@ class Node {
     }
 
     DataFrame createFrame();
+    void passToken();
     void sendFrame(DataFrame msg, int direction);
     void receiveFrame(DataFrame msg, int direction);
 };
