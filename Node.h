@@ -18,7 +18,7 @@ class Node {
         leftLink = NULL;
     }
 
-    DataFrame createFrame();     // shortest path is not considered yet
+    DataFrame createFrame();
     void sendFrame(DataFrame msg, int direction);
     void receiveFrame(DataFrame msg, int direction);
 };

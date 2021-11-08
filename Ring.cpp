@@ -21,49 +21,37 @@ string getRandomMac() {
             mac+=decTohex(rand()%16);
             if(i<5) mac+=':';
         }
-        if(macToDevId.find(mac) == macToDevId.end()) break;
-        else mac=="";
+        if(macToDevId.find(mac)==macToDevId.end()) break;
+        else mac="";
     }
     return mac;
 }
 
 void Ring::addNodeToNetwork() {
     string macAddress = getRandomMac();
-    cout<<macAddress<<endl;
     devIdToMac[ringsize] = macAddress;
     macToDevId[macAddress] = ringsize;
-    Node newNode(ringsize, macAddress);
-    cout<<newNode.deviceId<<" "<<newNode.macAddress<<endl;
-    cout<<&newNode<<endl;
+    Node* newNode = new Node(ringsize, macAddress);
     if(firstNode == NULL) {
-        firstNode = &newNode;
-        lastNode = &newNode;
-        Link newLink(newNode, newNode);
-        firstNode->rightLink = &newLink;
-        firstNode->leftLink = &newLink;
+        firstNode = newNode;
+        lastNode = newNode;
+        Link* newLink = new Link(*newNode, *newNode);
+        firstNode->rightLink = newLink;
+        firstNode->leftLink = newLink;
     }
     else {
-        // cout<<firstNode<<" "<<lastNode<<endl;
-        Link newRightLink(*firstNode, newNode);
-        Link newLeftLink(newNode,*lastNode);
-        newNode.leftLink = &newLeftLink;
-        newNode.rightLink = &newRightLink;
-        firstNode->leftLink=&newRightLink;
-        lastNode->rightLink=&newLeftLink;
-        lastNode = &newNode;
-        // cout<<firstNode<<" "<<lastNode<<endl;
+        Link* newRightLink = new Link(*firstNode, *newNode);
+        Link* newLeftLink = new Link(*newNode,*lastNode);
+        newNode->leftLink = newLeftLink;
+        newNode->rightLink = newRightLink;
+        firstNode->leftLink=newRightLink;
+        lastNode->rightLink=newLeftLink;
+        lastNode = newNode;
     }
     ringsize++;
 }
 
 void Ring::startNetwork() {
-    cout<<ringsize<<endl;
-    // TEST NETWORK
-    Node* noderef = firstNode;
-    for(int i=0;i<ringsize;i++) {
-        cout<<noderef<<" "<<noderef->rightLink<<endl;
-        noderef = noderef->rightLink->rightNode;
-    }
     token.receiverMac = devIdToMac[0];
     this->firstNode->receiveFrame(token, 0);
 }
