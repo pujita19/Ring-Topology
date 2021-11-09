@@ -51,8 +51,12 @@ void Ring::addNodeToNetwork() {
     ringsize++;
 }
 
-void Ring::startNetwork() {
+void Ring::startNetwork(int startNode) {
     token.Data = "0";
-    token.receiverMac = devIdToMac[0];
-    this->firstNode->receiveFrame(token, 0);
+    token.receiverMac = devIdToMac[startNode];
+    Node* ptr = firstNode;
+    while(startNode--) {
+        ptr=ptr->rightLink->rightNode;
+    }
+    ptr->receiveFrame(token, 0);
 }

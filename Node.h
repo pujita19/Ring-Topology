@@ -7,6 +7,7 @@ class Link;
 class Node {
     public:
     int deviceId;
+    DataFrame currframe;
     string macAddress;
     Link *rightLink;    // used to send the packet in clockwise direction
     Link *leftLink;    // used to send the packet in anti-clockwise direction
@@ -16,6 +17,10 @@ class Node {
         macAddress = macadd;
         rightLink = NULL;
         leftLink = NULL;
+        currframe.frameType = '0';
+        currframe.Data = "0";
+        currframe.senderMac = macAddress;
+        currframe.receiverMac = "0";
     }
 
     DataFrame createFrame();

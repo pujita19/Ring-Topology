@@ -29,17 +29,34 @@ int main() {
 
     cout<<"\nBeginning Simulation...\n\n";
 
-    cout<<"[Test 1] Ideal simulation: \n";
-    RingNetwork.startNetwork();    // start network
-    cout<<"\n\n";
+    // cout<<"[Test 1] Ideal simulation: \n";
+    // RingNetwork.startNetwork(0);    // start network
+    // cout<<"\n\n";
 
-    cout<<"[Test 2] Non existent destination simulation: \n";
-    testcase = 1;
-    RingNetwork.startNetwork();
+    // // For infinite simulation
+    // int curr = MAX_TOKEN%ringsize;
+    // while(1) {
+    //     RingNetwork.startNetwork(curr);
+    //     curr = (curr+MAX_TOKEN)%ringsize;
+    // }
+
+    // cout<<"[Test 2] Non existent destination simulation: \n";
+    // testcase = 1;
+    // RingNetwork.startNetwork(0);
     
-    // 1 broken link
+    // cout<<"[Test 3] Single broken link: \n";
+    // testcase = 2;
+    // int brokenLink = 2;     // broken link from cw direction
+    // Node* ptr = RingNetwork.firstNode;
+    // while(brokenLink--) {
+    //     ptr = ptr->rightLink->rightNode;
+    // }
+    // ptr->rightLink->isBroken = true;
+    // RingNetwork.startNetwork(0);
+
     // 2 broken links and check network
     // node down
+
 
     return 0;
 } 
