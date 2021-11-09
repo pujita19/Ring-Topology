@@ -12,7 +12,7 @@ string getRandomString() {
 void Node::passToken() {
     if(this->rightLink->isBroken) {
         cout<<"DeviceID "<<deviceId<<": ";
-        cout<<"Token can't be passed to next node\n"<<endl;
+        cout<<"Token can't be passed to device "<<(deviceId+1)%ringsize<<endl<<endl;
         cout<<"Network terminated\n";
         return;
     }
@@ -61,8 +61,13 @@ void Node::sendFrame(DataFrame msg, int direction) {
             msg.frameType = 'b';
             msg.Data = "Link between " + to_string(deviceId)  + " " + to_string((deviceId+1)%ringsize)+" is broken";
             msg.receiverMac = msg.senderMac;
-            msg.senderMac = this->macAddress;
-            this->leftLink->transmitFrame(msg, 1-direction);
+            if(msg.receiverMac==macAddress) {
+                this->receiveFrame(msg, 1-direction);
+            }
+            else {
+                msg.senderMac = this->macAddress;
+                this->leftLink->transmitFrame(msg, 1-direction);
+            }
         }
         else this->rightLink->transmitFrame(msg, direction);
     } 
@@ -71,8 +76,13 @@ void Node::sendFrame(DataFrame msg, int direction) {
             msg.frameType = 'b';
             msg.Data = "Link between " + to_string((deviceId-1+ringsize)%ringsize)  + " " + to_string(deviceId)+" is broken";
             msg.receiverMac = msg.senderMac;
-            msg.senderMac = this->macAddress;
-            this->rightLink->transmitFrame(msg, 1-direction);
+            if(msg.receiverMac==macAddress) {
+                this->receiveFrame(msg, 1-direction);
+            }
+            else {
+                msg.senderMac = this->macAddress;
+                this->rightLink->transmitFrame(msg, 1-direction);
+            }
         }
         else this->leftLink->transmitFrame(msg, direction);
     } 
@@ -85,14 +95,23 @@ void Node::receiveFrame(DataFrame msg, int direction) {
     char msgType = msg.frameType;
     if(msgType == 'b') {
         if(msg.receiverMac == this->macAddress) {
-            cout<<msg.Data<<endl;
-            cout<<"DeviceID "<<deviceId<<": ";
-            cout<<"Message transmiting in opposite direction"<<endl;
-            msg.Data = currframe.Data;
-            msg.frameType = currframe.frameType;
-            msg.receiverMac = currframe.receiverMac;
-            msg.senderMac = currframe.senderMac;
-            this->sendFrame(msg, direction);
+            countBroken++;
+            if(countBroken==2) {
+                cout<<msg.Data<<endl;
+                cout<<"Sending frame to device "<<macToDevId[currframe.receiverMac]<<" is not possible \n";
+                cout<<"Due to two broken links\n"<<endl; 
+                this->passToken();
+            }
+            else {
+                cout<<msg.Data<<endl;
+                cout<<"DeviceID "<<deviceId<<": ";
+                cout<<"Message transmiting in opposite direction"<<endl;
+                msg.Data = currframe.Data;
+                msg.frameType = currframe.frameType;
+                msg.receiverMac = currframe.receiverMac;
+                msg.senderMac = currframe.senderMac;
+                this->sendFrame(msg, direction);
+            }
         } 
         else {
             cout<<"Message passed forward"<<endl;
@@ -128,6 +147,7 @@ void Node::receiveFrame(DataFrame msg, int direction) {
     }
     else {
         if(msg.receiverMac == this->macAddress) {
+            countBroken = 0;
             DataFrame newframe = createFrame();
             currframe.Data = newframe.Data;
             currframe.frameType = newframe.frameType;

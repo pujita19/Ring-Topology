@@ -16,5 +16,4 @@ class Ring {
     }
     void addNodeToNetwork();    // create network
     void startNetwork(int startNode);     // creates token and send it to given start node to start the network
-    void checkNetwork();    // check if any links are broken
 };

@@ -7,12 +7,14 @@ class Link;
 class Node {
     public:
     int deviceId;
+    int countBroken;    // no.of time curr frame returned due to broken links
     DataFrame currframe;
     string macAddress;
     Link *rightLink;    // used to send the packet in clockwise direction
     Link *leftLink;    // used to send the packet in anti-clockwise direction
     // direction 0: clockwise, 1: anti-clockwise  
     Node(int deviceid, string macadd) {
+        countBroken = 0;
         deviceId = deviceid;
         macAddress = macadd;
         rightLink = NULL;

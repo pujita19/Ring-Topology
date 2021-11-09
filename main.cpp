@@ -54,9 +54,22 @@ int main() {
     // ptr->rightLink->isBroken = true;
     // RingNetwork.startNetwork(0);
 
-    // 2 broken links and check network
-    // node down
+    // cout<<"[Test 4] Two broken links: \n";
+    // testcase = 3;
+    // int brokenLink1 = 1;
+    // int brokenLink2 = 5;
+    // Node* ptr = RingNetwork.firstNode;
+    // while(brokenLink1--) {
+    //     ptr = ptr->rightLink->rightNode;
+    // }
+    // ptr->rightLink->isBroken = true;
 
+    // ptr = RingNetwork.firstNode;
+    // while(brokenLink2--) {
+    //     ptr = ptr->rightLink->rightNode;
+    // }
+    // ptr->rightLink->isBroken = true;
+    // RingNetwork.startNetwork(0);    
 
     return 0;
 } 
